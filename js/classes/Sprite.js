@@ -16,6 +16,7 @@ class Sprite {
         this.elapsedFrames = 0
     }
 
+
     draw() {
         if (!this.image) return
 

@@ -45,13 +45,14 @@ platformCollisions2D.forEach((row, y) => {
                         x: x * 16,
                         y: y * 16,
                     },
+                    height: 4,
                 })
             )
         }
     })
 })
 
-const gravity = 0.5
+const gravity = 0.1
 
 const player = new Player({
     position: {
@@ -59,6 +60,7 @@ const player = new Player({
         y: 300,
     },
     collisionBlocks,
+    platformCollisionBlocks,
     imageSrc: './img/warrior/Idle.png',
     frameRate: 8,
     animations: {
@@ -123,6 +125,15 @@ const background = new Sprite({
     imageSrc: './img/background.png',
 })
 
+const backgroundImageHeight = 432
+
+const camera = {
+    position: {
+        x: 0,
+        y: -backgroundImageHeight + scaledCanvas.height,
+    }
+}
+
 function animate() {
     window.requestAnimationFrame(animate)
     c.fillStyle = 'white'
@@ -130,16 +141,17 @@ function animate() {
 
     c.save()
     c.scale(4, 4)
-    c.translate(0, -background.image.height + scaledCanvas.height)
+    c.translate(camera.position.x, camera.position.y)
     background.update()
-    collisionBlocks.forEach((collisionBlock) => {
-        collisionBlock.update()
-    })
+    // collisionBlocks.forEach((collisionBlock) => {
+    //     collisionBlock.update()
+    // })
 
-    platformCollisionBlocks.forEach((block) => {
-        block.update()
-    })
+    // platformCollisionBlocks.forEach((block) => {
+    //     block.update()
+    // })
 
+    player.checkForHorizontalCanvasCollision()
     player.update()
 
     player.velocity.x = 0
@@ -147,10 +159,12 @@ function animate() {
         player.switchSprite('Run')
         player.velocity.x = 2
         player.lastDirection = 'right'
+        player.shouldPanCameraToTheLeft({ canvas, camera })
     } else if (keys.a.pressed) {
         player.switchSprite('RunLeft')
         player.velocity.x = -2
         player.lastDirection = 'left'
+        player.shouldPanCameraToTheRight({ canvas, camera })
     }
     else if (player.velocity.y === 0) {
         if (player.lastDirection === 'right') player.switchSprite('Idle')
@@ -158,11 +172,13 @@ function animate() {
     }
 
     if (player.velocity.y < 0) {
+        player.shouldPanCameraDown({ camera, canvas })
         if (player.lastDirection === 'right') player.switchSprite('Jump')
         else player.switchSprite('JumpLeft')
     }
 
     else if (player.velocity.y > 0) {
+        player.shouldPanCameraUp({ camera, canvas })
         if (player.lastDirection === 'right') player.switchSprite('Fall')
         else player.switchSprite('FallLeft')
     }
@@ -182,7 +198,7 @@ window.addEventListener('keydown', (event) => {
             break
 
         case 'w':
-            player.velocity.y = -8
+            player.velocity.y = -4
             break
     }
 })

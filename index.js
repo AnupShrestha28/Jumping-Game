@@ -59,6 +59,7 @@ const player = new Player({
         y: 0,
     },
     collisionBlocks,
+    imageSrc: './img/warrior/Idle.png',
 })
 
 const keys = {
@@ -118,7 +119,7 @@ window.addEventListener('keydown', (event) => {
             break
 
         case 'w':
-            player.velocity.y = -20
+            player.velocity.y = -8
             break
     }
 })
